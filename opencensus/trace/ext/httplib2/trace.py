@@ -46,13 +46,14 @@ def wrap_httplib2_request(request_func):
         request_func (function): The `httplib2` function to wrap.
     """
 
-    def call(self, url, method, *args, **kwargs):
+    def call(self, url, **kwargs):
         _tracer = execution_context.get_opencensus_tracer()
         _span = _tracer.start_span()
         _span.span_kind = span_module.SpanKind.CLIENT
         _span.name = '[httplib2]{}'.format(request_func.__name__)
 
         # Add attributes to span
+        method = kwargs.get('method', 'GET')
         _tracer.add_attribute_to_current_span(HTTP_URL, url)
         _tracer.add_attribute_to_current_span(HTTP_METHOD, method)
 
@@ -65,7 +66,7 @@ def wrap_httplib2_request(request_func):
             pass
 
         # Fire request and get response
-        (r, data) = request_func(self, url, method, *args, **kwargs)
+        (r, data) = request_func(self, url, **kwargs)
 
         # Add the status code to attributes
         _tracer.add_attribute_to_current_span(HTTP_STATUS_CODE, str(r.status))

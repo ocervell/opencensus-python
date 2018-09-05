@@ -84,16 +84,16 @@ class Test_httplib2_trace(unittest.TestCase):
         status_code = '200'
         headers = {}
         expected_attributes = {
-            '/http/url': url,
-            '/http/method': method,
-            '/http/status_code': status_code
+            'http.url': url,
+            'http.method': method,
+            'http.status_code': status_code
         }
         expected_name = '[httplib2]request'
 
         # Call wrapped 'httplib2.request'
         wrapped = trace.wrap_httplib2_request(mock_request_func)
         with patch_tracer, patch_attr:
-            wrapped(mock.Mock(), url, method, body=body, headers=headers)
+            wrapped(mock.Mock(), url, method=method, body=body, headers=headers)
 
         # Tests
         self.assertEqual(
