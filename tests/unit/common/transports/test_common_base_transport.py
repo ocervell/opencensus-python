@@ -12,23 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opencensus.tags.validation import is_valid_tag_name
+import unittest
 
-_TAG_NAME_ERROR = \
-    'tag name must not be empty,' \
-    'no longer than 255 characters and of ascii values between 32 - 126'
+class TestCommonBaseTransport(unittest.TestCase):
 
+    def test_export_abstract(self):
+        from opencensus.common.transports import base
 
-class TagKey(str):
-    """A tag key with a property name"""
+        transport = base.Transport()
+        trace = {}
 
-    def __new__(cls, name):
-        """Create and return a new tag key
+        with self.assertRaises(NotImplementedError):
+            transport.export(trace)
 
-        :type name: str
-        :param name: The name of the key
-        :return: TagKey
-        """
-        if not is_valid_tag_name(name):
-            raise ValueError(_TAG_NAME_ERROR)
-        return super(TagKey, cls).__new__(cls, name)
+    def test_flush_abstract_and_optional(self):
+        from opencensus.common.transports import base
+
+        transport = base.Transport()
+        transport.flush()

@@ -12,23 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opencensus.tags.validation import is_valid_tag_name
-
-_TAG_NAME_ERROR = \
-    'tag name must not be empty,' \
-    'no longer than 255 characters and of ascii values between 32 - 126'
+from opencensus.common.transports import base
 
 
-class TagKey(str):
-    """A tag key with a property name"""
+class SyncTransport(base.Transport):
+    def __init__(self, exporter):
+        self.exporter = exporter
 
-    def __new__(cls, name):
-        """Create and return a new tag key
-
-        :type name: str
-        :param name: The name of the key
-        :return: TagKey
-        """
-        if not is_valid_tag_name(name):
-            raise ValueError(_TAG_NAME_ERROR)
-        return super(TagKey, cls).__new__(cls, name)
+    def export(self, datas):
+        self.exporter.emit(datas)
