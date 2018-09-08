@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import atexit
+import logging
 import threading
 import time
 
@@ -102,9 +103,9 @@ class _Worker(object):
             if data:
                 try:
                     self.exporter.emit(data)
-                except Exception as e:
+                except Exception:
                     logging.exception(
-                        '%s failed to emit data after max retries.'
+                        '%s failed to emit data.'
                         'Dropping %s objects from queue.',
                         self.exporter.__class__.__name__,
                         len(data))

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import atexit
+import logging
 import threading
 import time
-import logging
 
 from six.moves import queue
 from six.moves import range
@@ -104,9 +104,9 @@ class _Worker(object):
             if span_datas:
                 try:
                     self.exporter.emit(span_datas)
-                except Exception as e:
+                except Exception:
                     logging.exception(
-                        '%s failed to emit spans after max retries.'
+                        '%s failed to emit spans.'
                         'Dropping %s spans from queue.',
                         self.exporter.__class__.__name__,
                         len(span_datas))
