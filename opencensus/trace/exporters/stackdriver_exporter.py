@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import os
+import logging
 
 from collections import defaultdict
 from google.cloud.trace.client import Client
-
+from google.auth.exceptions import DefaultCredentialsError
 from opencensus.trace import attributes_helper
 from opencensus.trace import span_data
 from opencensus.trace.attributes import Attributes
@@ -137,6 +138,11 @@ class StackdriverExporter(base.Exporter):
         self.project_id = client.project
         self.transport = transport(self)
 
+    def refresh_client(self):
+        """Recreate Google Cloud Trace client with fresh credentials."""
+        self.client = Client(project=self.project_id)
+        logging.info('Refreshed Cloud Trace client ...')
+
     def emit(self, span_datas):
         """
         :type span_datas: list of :class:
@@ -157,7 +163,13 @@ class StackdriverExporter(base.Exporter):
             # TODO: refactor this to use the span data directly
             trace = span_data.format_legacy_trace_json(sds)
             stackdriver_spans = self.translate_to_stackdriver(trace)
-            self.client.batch_write_spans(project, stackdriver_spans)
+            try:
+                self.client.batch_write_spans(project, stackdriver_spans)
+            except DefaultCredentialsError:
+                logging.exception()
+                logging.error('Batch write spans failed. Refreshing client.')
+                self.refresh_client()
+                self.client.batch_write_spans(project, stackdriver_spans)
 
     def export(self, span_datas):
         """
