@@ -34,6 +34,7 @@ ATTRIBUTE_ERROR_NAME = 'ERROR_NAME'
 ATTRIBUTE_ERROR_MESSAGE = 'ERROR_MESSAGE'
 RECV_PREFIX = 'Recv'
 
+logger = logging.getLogger(__name__)
 
 class OpenCensusServerInterceptor(grpc.ServerInterceptor):
     def __init__(self, sampler=None, exporter=None):
@@ -110,8 +111,8 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
         span = tracer.start_span(
             name=_get_span_name(servicer_context)
         )
-	print("OC INTERCEPTOR - TRACE ID: %s" % tracer.span_context.trace_id)
-	print("OC INTERCEPTOR - SPAN ID: %s" % tracer.span_context.span_id)
+	logger.info("OC INTERCEPTOR - TRACE ID: %s" % tracer.span_context.trace_id)
+	logger.info("OC INTERCEPTOR - SPAN ID: %s" % tracer.span_context.span_id)
         span.span_kind = span_module.SpanKind.SERVER
         tracer.add_attribute_to_current_span(
             attribute_key=attributes_helper.COMMON_ATTRIBUTES.get(
