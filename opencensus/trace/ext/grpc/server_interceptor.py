@@ -36,9 +36,10 @@ RECV_PREFIX = 'Recv'
 
 
 class OpenCensusServerInterceptor(grpc.ServerInterceptor):
-    def __init__(self, sampler=None, exporter=None):
+    def __init__(self, sampler=None, exporter=None, tracer=None):
         self.sampler = sampler
         self.exporter = exporter
+        self.tracer = tracer
 
     def intercept_service(self, continuation, handler_call_details):
         def trace_wrapper(behavior, request_streaming, response_streaming):
@@ -101,10 +102,13 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
             metadata_dict = dict(metadata)
             trace_header = metadata_dict.get(oc_grpc.GRPC_TRACE_KEY)
             span_context = propagator.from_header(trace_header)
-
-        tracer = tracer_module.Tracer(span_context=span_context,
-                                      sampler=self.sampler,
-                                      exporter=self.exporter)
+            tracer = tracer_module.Tracer(span_context=span_context,
+                                          sampler=self.sampler,
+                                          exporter=self.exporter)
+            self.tracer = tracer
+            
+         elif self.tracer is not None:
+            tracer = self.tracer
 
         span = tracer.start_span(
             name=_get_span_name(servicer_context)
@@ -117,9 +121,6 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
 
         execution_context.set_opencensus_tracer(tracer)
         execution_context.set_current_span(span)
-
-        # Gives ability to introspect tracer
-        self.tracer = tracer
         return span
 
 
