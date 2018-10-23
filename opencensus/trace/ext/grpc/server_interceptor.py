@@ -101,7 +101,6 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
             propagator = binary_format.BinaryFormatPropagator()
             metadata_dict = dict(metadata)
             trace_header = metadata_dict.get(oc_grpc.GRPC_TRACE_KEY)
-
             span_context = propagator.from_header(trace_header)
 
         tracer = tracer_module.Tracer(span_context=span_context,
@@ -111,8 +110,6 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
         span = tracer.start_span(
             name=_get_span_name(servicer_context)
         )
-	logger.info("OC INTERCEPTOR - TRACE ID: %s" % tracer.span_context.trace_id)
-	logger.info("OC INTERCEPTOR - SPAN ID: %s" % tracer.span_context.span_id)
         span.span_kind = span_module.SpanKind.SERVER
         tracer.add_attribute_to_current_span(
             attribute_key=attributes_helper.COMMON_ATTRIBUTES.get(
@@ -121,6 +118,9 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
 
         execution_context.set_opencensus_tracer(tracer)
         execution_context.set_current_span(span)
+
+        # Gives ability to introspect tracer
+        self.tracer = tracer
         return span
 
 
