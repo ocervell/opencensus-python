@@ -83,7 +83,7 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
                     # if the response is unary, end the span here. Otherwise
                     # it will be closed when the response iter completes
                     if not response_streaming:
-                        execution_context.get_opencensus_tracer().end_span()
+                        self.tracer.end_span()
                 return response_or_iterator
 
             return new_behavior
