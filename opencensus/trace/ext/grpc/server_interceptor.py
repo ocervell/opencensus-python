@@ -111,8 +111,7 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
         span = tracer.start_span(
             name=_get_span_name(servicer_context)
         )
-	logger.info("OC INTERCEPTOR - TRACE ID: %s" % tracer.span_context.trace_id)
-	logger.info("OC INTERCEPTOR - SPAN ID: %s" % tracer.span_context.span_id)
+	logger.info("Span context (inside interceptor): %s" % tracer.span_context)
         span.span_kind = span_module.SpanKind.SERVER
         tracer.add_attribute_to_current_span(
             attribute_key=attributes_helper.COMMON_ATTRIBUTES.get(
