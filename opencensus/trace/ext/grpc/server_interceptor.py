@@ -34,7 +34,6 @@ ATTRIBUTE_ERROR_NAME = 'ERROR_NAME'
 ATTRIBUTE_ERROR_MESSAGE = 'ERROR_MESSAGE'
 RECV_PREFIX = 'Recv'
 
-logger = logging.getLogger(__name__)
 
 class OpenCensusServerInterceptor(grpc.ServerInterceptor):
     def __init__(self, sampler=None, exporter=None):
