@@ -106,7 +106,7 @@ class OpenCensusServerInterceptor(grpc.ServerInterceptor):
                                           sampler=self.sampler,
                                           exporter=self.exporter)
             self.tracer = tracer
-            
+
         elif self.tracer is not None:
             tracer = self.tracer
 
